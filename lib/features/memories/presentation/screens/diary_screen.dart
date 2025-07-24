@@ -29,9 +29,15 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   void _onScroll() {
+    final prov = context.read<MemoryProvider>();
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      //context.read<MemoryProvider>().loadMore(); //TODO Aggiungere nel provider funzione che carica altri memories
+      if (prov.hasMore && !prov.isLoading) {
+        final userId = context.read<AuthProvider>().firebaseUser?.uid;
+        if (userId != null) {
+          prov.fetchMemoriesPaginated(userId);
+        }
+      }
     }
   }
 
@@ -44,8 +50,11 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final memories = context.watch<MemoryProvider>().memories;
+    final prov = context.watch<MemoryProvider>();
+    final memories = prov.memories;
     final colorScheme = Theme.of(context).colorScheme;
+    final isLoading = prov.isLoading;
+    final hasMore = prov.hasMore;
 
     return Scaffold(
       appBar: BlurAppBar(
@@ -85,30 +94,41 @@ class _DiaryScreenState extends State<DiaryScreen> {
               child: RefreshIndicator(
                 onRefresh: () async {
                   final userId = context.read<AuthProvider>().firebaseUser!.uid;
-                  context.read<MemoryProvider>().fetchMemories(userId);
+                  prov.fetchMemoriesPaginated(userId, clear: true);
                 },
-                child: memories.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Non hai ancora salvato ricordi. \n Aggiungine e rivivi le tue esperienze!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: colorScheme.onSurface.withOpacity(0.7),
-                            fontSize: 16,
-                          ),
-                        ),
+                child: memories.isEmpty && isLoading
+                    ? ListView.builder(
+                        itemCount: 5,
+                        itemBuilder: (_, __) => const _MemorySkeleton(),
                       )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        itemCount: memories.length,
-                        itemBuilder: (context, i) {
-                          final m = memories[i];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: MemoryCard(memory: m),
-                          );
-                        },
-                      ),
+                    : memories.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Non hai ancora salvato ricordi. \n Aggiungine e rivivi le tue esperienze!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: colorScheme.onSurface.withOpacity(0.7),
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            itemCount: memories.length + (hasMore ? 1 : 0),
+                            itemBuilder: (context, i) {
+                              if (i < memories.length) {
+                                final m = memories[i];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: MemoryCard(memory: m),
+                                );
+                              } else {
+                                return const Padding(
+                                  padding: EdgeInsets.all(16),
+                                );
+                              }
+                            },
+                          ),
               ),
             ),
           ],
@@ -131,6 +151,18 @@ class _DiaryScreenState extends State<DiaryScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) => CreateMemorySheet(),
+    );
+  }
+}
+
+class _MemorySkeleton extends StatelessWidget {
+  const _MemorySkeleton();
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: SizedBox(height: 120, child: Center(child: CircularProgressIndicator())),
     );
   }
 }

@@ -24,7 +24,7 @@ import 'package:tixly/core/theme/theme_mode_provider.dart';
 import 'features/auth/data/providers/auth_provider.dart' as app;
 import 'features/profile/data/providers/user_provider.dart';
 import 'features/feed/data/providers/post_provider.dart';
-import 'features/feed/data/providers/comment_provider.dart';
+import 'features/feed/presentation/providers/comment_provider.dart';
 import 'features/wallet/data/providers/wallet_provider.dart';
 import 'package:tixly/features/wallet/domain/usecases/fetch_tickets_usecase.dart';
 import 'package:tixly/features/wallet/domain/usecases/add_ticket_usecase.dart';
@@ -32,6 +32,9 @@ import 'package:tixly/features/wallet/domain/usecases/delete_ticket_usecase.dart
 import 'features/wallet/data/providers/event_provider.dart';
 import 'features/memories/data/providers/memory_provider.dart';
 import 'features/profile/data/providers/profile_provider.dart';
+import 'features/wallet/data/repositories/ticket_repository_impl.dart';
+import 'features/feed/data/repositories/post_repository_impl.dart';
+import 'features/memories/data/repositories/memory_repository_impl.dart';
 
 // Screens
 import 'features/auth/presentation/screens/login_page.dart';
@@ -121,31 +124,13 @@ class _TixlyAppState extends State<TixlyApp> {
 
         // Feed
         ChangeNotifierProvider(create: (_) => di.sl<PostProvider>()),
-        ChangeNotifierProvider(
-          create: (_) => CommentProvider(
-            getCommentsUseCase: di.sl<GetCommentsUseCase>(),
-            addCommentUseCase: di.sl<AddCommentUseCase>(),
-            deleteCommentUseCase: di.sl<DeleteCommentUseCase>(),
-            updateCommentUseCase: di.sl<UpdateCommentUseCase>(),
-          ),
-        ),
+        ChangeNotifierProvider(create: (_) => di.sl<CommentProvider>()),
 
         // Altri provider
-        ChangeNotifierProvider(
-          create: (_) => WalletProvider(
-            fetchTicketsUsecase: di.sl<FetchTicketsUsecase>(),
-            addTicketUsecase: di.sl<AddTicketUsecase>(),
-            deleteTicketUsecase: di.sl<DeleteTicketUsecase>(),
-          ),
-        ),
+        ChangeNotifierProvider(create: (_) => di.sl<WalletProvider>()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
-        ChangeNotifierProvider(create: (_) => MemoryProvider()),
-        ChangeNotifierProvider(
-          create: (_) => ProfileProvider(
-            fetchProfileUsecase: di.sl<FetchProfileUsecase>(),
-            updateProfileUsecase: di.sl<UpdateProfileUsecase>(),
-          ),
-        ),
+        ChangeNotifierProvider(create: (_) => di.sl<MemoryProvider>()),
+        ChangeNotifierProvider(create: (_) => di.sl<ProfileProvider>()),
         ChangeNotifierProvider(create: (_) => ThemeModeProvider()),
       ],
       child: Consumer2<app.AuthProvider, ThemeModeProvider>(

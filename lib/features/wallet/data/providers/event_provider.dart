@@ -18,7 +18,7 @@ class EventProvider with ChangeNotifier {
       }).toList();
       notifyListeners();
     } catch (e) {
-      debugPrint('Errore fetchEvent: $e');
+      // debugPrint('Errore fetchEvent: $e');
     }
   }
 
@@ -27,7 +27,7 @@ class EventProvider with ChangeNotifier {
       await FirebaseFirestore.instance.collection('events').add(events.toMap());
       await fetchEvents();
     } catch (e) {
-      debugPrint("Errore aggiunta ricordo: $e");
+      // debugPrint("Errore aggiunta ricordo: $e");
     }
   }
 }

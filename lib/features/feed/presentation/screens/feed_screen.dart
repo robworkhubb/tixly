@@ -19,14 +19,29 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> {
   final ScrollController _scrollCtrl = ScrollController();
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
     super.initState();
-    // Avvia lo stream dei post
+    _scrollCtrl.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PostProvider>().listenToPosts();
+      context.read<PostProvider>().fetchPostsPaginated(clear: true);
     });
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+    
+    final prov = context.read<PostProvider>();
+    if (_scrollCtrl.position.pixels >= _scrollCtrl.position.maxScrollExtent - 200) {
+      if (prov.hasMore && !prov.isLoading) {
+        setState(() => _isLoadingMore = true);
+        prov.fetchPostsPaginated().then((_) {
+          if (mounted) setState(() => _isLoadingMore = false);
+        });
+      }
+    }
   }
 
   @override
@@ -36,8 +51,8 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Future<void> _onRefresh() async {
-    // Riascolta (riavvia lo stream)
-    context.read<PostProvider>().listenToPosts();
+    final prov = context.read<PostProvider>();
+    await prov.fetchPostsPaginated(clear: true);
     // Ricarica eventuali dati utente
     final uid = context.read<UserProvider>().user!.id;
     await context.read<UserProvider>().loadUser(uid);
@@ -47,6 +62,7 @@ class _FeedScreenState extends State<FeedScreen> {
     final uid = context.read<UserProvider>().user!.id;
     final result = await showModalBottomSheet<Map<String, String?>>(
       context: context,
+      isScrollControlled: true,
       builder: (_) => const CreatePostSheet(),
     );
 
@@ -75,10 +91,16 @@ class _FeedScreenState extends State<FeedScreen> {
     final postProv = context.watch<PostProvider>();
     final posts = postProv.posts;
     final uid = context.watch<UserProvider>().user?.id;
+    final isLoading = postProv.isLoading;
+    final hasMore = postProv.hasMore;
+    final initialLoadDone = postProv.initialLoadDone;
 
     Widget body;
-    if (postProv.isLoading && posts.isEmpty) {
-      body = const Center(child: CircularProgressIndicator());
+    if (!initialLoadDone) {
+      body = ListView.builder(
+        itemCount: 5,
+        itemBuilder: (_, __) => const _PostSkeleton(),
+      );
     } else if (posts.isEmpty) {
       body = ListView(
         controller: _scrollCtrl,
@@ -92,9 +114,21 @@ class _FeedScreenState extends State<FeedScreen> {
       body = ListView.builder(
         controller: _scrollCtrl,
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: posts.length,
+        itemCount: posts.length + (hasMore && _isLoadingMore ? 1 : 0),
         itemBuilder: (ctx, i) {
-          return PostCard(post: Post.fromEntity(posts[i]), currentUid: uid);
+          if (i < posts.length) {
+            return RepaintBoundary(
+              child: PostCard(
+                post: Post.fromEntity(posts[i]),
+                currentUid: uid,
+              ),
+            );
+          } else {
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
         },
       );
     }
@@ -114,6 +148,18 @@ class _FeedScreenState extends State<FeedScreen> {
         onPressed: _onAddPressed,
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class _PostSkeleton extends StatelessWidget {
+  const _PostSkeleton();
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: SizedBox(height: 200, child: Center(child: CircularProgressIndicator())),
     );
   }
 }

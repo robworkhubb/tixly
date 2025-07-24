@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tixly/features/auth/data/providers/auth_provider.dart';
 import 'package:tixly/features/feed/data/models/comment_model.dart';
-import 'package:tixly/features/feed/data/providers/comment_provider.dart';
+import 'package:tixly/features/feed/presentation/providers/comment_provider.dart';
 
 import '../widgets/comment_card.dart';
 

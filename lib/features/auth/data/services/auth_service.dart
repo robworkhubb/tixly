@@ -14,10 +14,8 @@ class AuthService {
       );
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      debugPrint('Firebase Auth error: ${e.code} - ${e.message}');
       return null;
     } catch (e) {
-      debugPrint('Generic error: $e');
       return null;
     }
   }

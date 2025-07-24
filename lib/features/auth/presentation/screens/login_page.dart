@@ -31,6 +31,8 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.text.trim(),
       );
 
+      if (!mounted) return; // <-- controllo dopo l'await
+
       if (!success) {
         setState(() {
           _errorMessage = "Login fallito: email o password errati.";
@@ -38,10 +40,12 @@ class _LoginPageState extends State<LoginPage> {
       }
       // Se success true, il provider notificherà l’app automaticamente
     } catch (e) {
+      if (!mounted) return; // <-- controllo dopo l'await
       setState(() {
         _errorMessage = 'Errore: ${e.toString()}';
       });
     } finally {
+      if (!mounted) return; // <-- controllo dopo l'await
       setState(() {
         _isLoading = false;
       });

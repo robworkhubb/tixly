@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tixly/features/feed/data/models/comment_model.dart';
 import 'package:tixly/features/profile/data/providers/user_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CommentCard extends StatelessWidget {
   final CommentModel comment;
@@ -37,12 +38,19 @@ class CommentCard extends StatelessWidget {
           // Avatar: prima immagine, poi iniziale se non c'è URL
           CircleAvatar(
             radius: 16,
-            backgroundImage: authorAvatar != null
-                ? NetworkImage(authorAvatar)
-                : null,
-            child: authorAvatar == null
-                ? Text(authorName.isNotEmpty ? authorName[0] : '?')
-                : null,
+            backgroundColor: Colors.grey[200],
+            child: authorAvatar != null
+                ? ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: authorAvatar,
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2),
+                      errorWidget: (_, __, ___) => Text(authorName.isNotEmpty ? authorName[0] : '?'),
+                    ),
+                  )
+                : Text(authorName.isNotEmpty ? authorName[0] : '?'),
           ),
           const SizedBox(width: 8),
           // Contenuto commento

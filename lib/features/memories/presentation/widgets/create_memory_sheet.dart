@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tixly/features/auth/data/providers/auth_provider.dart';
 import 'package:tixly/features/memories/data/models/memory_model.dart';
 import 'package:tixly/features/memories/data/providers/memory_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CreateMemorySheet extends StatefulWidget {
   final MemoryModel? memory;
@@ -149,10 +150,12 @@ class _CreateMemorySheetState extends State<CreateMemorySheet> {
                   Image.file(_imageFile!, height: 120, fit: BoxFit.cover)
                 else if (_exsistingImageUrl?.isNotEmpty == true)
                   // se sto editando e ho già una URL
-                  Image.network(
-                    _exsistingImageUrl!,
+                  CachedNetworkImage(
+                    imageUrl: _exsistingImageUrl!,
                     height: 120,
                     fit: BoxFit.cover,
+                    placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+                    errorWidget: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
                   )
                 else
                   // altrimenti il bottone "Aggiungi foto"

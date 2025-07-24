@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tixly/features/memories/data/models/memory_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MemoryCard extends StatelessWidget {
   final MemoryModel memory;
@@ -8,11 +9,11 @@ class MemoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 🔥 debug veloce: controlla cosa arriva davvero
-    debugPrint(
-      'MemoryCard[${memory.id}] '
-      'imageUrl=${memory.imageUrl} '
-      'rating=${memory.rating}',
-    );
+    // debugPrint(
+    //   'MemoryCard[${memory.id}] '
+    //   'imageUrl=${memory.imageUrl} '
+    //   'rating=${memory.rating}',
+    // );
 
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -28,14 +29,11 @@ class MemoryCard extends StatelessWidget {
           if (memory.imageUrl?.isNotEmpty == true)
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: Image.network(
-                memory.imageUrl!,
+              child: CachedNetworkImage(
+                imageUrl: memory.imageUrl!,
                 fit: BoxFit.cover,
-                loadingBuilder: (_, child, prog) => prog == null
-                    ? child
-                    : const Center(child: CircularProgressIndicator()),
-                errorBuilder: (_, __, ___) =>
-                    const Center(child: Icon(Icons.broken_image)),
+                placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+                errorWidget: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
               ),
             ),
 

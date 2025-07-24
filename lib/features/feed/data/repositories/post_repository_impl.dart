@@ -36,6 +36,21 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<List<PostEntity>> fetchPostsPaginated({PostEntity? last, int limit = 10}) async {
+    var query = _db
+        .collection('posts')
+        .orderBy('timestamp', descending: true)
+        .limit(limit);
+    if (last != null) {
+      query = query.startAfter([Timestamp.fromDate(last.timestamp)]);
+    }
+    final snap = await query.get();
+    return snap.docs
+        .map((doc) => Post.fromMap(doc.data(), doc.id).toEntity())
+        .toList();
+  }
+
+  @override
   Future<void> addPost(PostEntity post, {String? filePath}) async {
     try {
       String? mediaUrl;

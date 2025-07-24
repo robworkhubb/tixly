@@ -25,7 +25,6 @@ class CommentRepositoryImpl implements CommentRepository {
                 .toList();
           });
     } catch (e) {
-      debugPrint('❌ Error getting comments: $e');
       rethrow;
     }
   }
@@ -51,7 +50,6 @@ class CommentRepositoryImpl implements CommentRepository {
           .collection('comments')
           .add(comment.toMap());
     } catch (e) {
-      debugPrint('❌ Error adding comment: $e');
       rethrow;
     }
   }
@@ -69,7 +67,6 @@ class CommentRepositoryImpl implements CommentRepository {
           .doc(commentId)
           .delete();
     } catch (e) {
-      debugPrint('❌ Error deleting comment: $e');
       rethrow;
     }
   }
@@ -88,7 +85,6 @@ class CommentRepositoryImpl implements CommentRepository {
           .doc(commentId)
           .update({'content': content});
     } catch (e) {
-      debugPrint('❌ Error updating comment: $e');
       rethrow;
     }
   }

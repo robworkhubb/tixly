@@ -36,7 +36,6 @@ class UserProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ loadUser error: $e');
       rethrow;
     }
   }
@@ -62,7 +61,6 @@ class UserProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ loadProfile error: $e');
       rethrow;
     }
   }
@@ -87,7 +85,6 @@ class UserProvider with ChangeNotifier {
       );
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ updateProfile error: $e');
       rethrow;
     }
   }
@@ -110,7 +107,6 @@ class UserProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('❌ refreshProfile error: $e');
       rethrow;
     }
   }

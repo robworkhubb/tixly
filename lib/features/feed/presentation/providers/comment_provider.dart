@@ -45,7 +45,6 @@ class CommentProvider extends ChangeNotifier {
         notifyListeners();
       },
       onError: (e) {
-        debugPrint('❌ Error listening to comments: $e');
         _error = e.toString();
         _isLoading = false;
         notifyListeners();
@@ -66,9 +65,7 @@ class CommentProvider extends ChangeNotifier {
       );
       _error = null;
     } catch (e) {
-      debugPrint('❌ Error adding comment: $e');
-      _error = e.toString();
-      notifyListeners();
+      rethrow;
     }
   }
 
@@ -80,9 +77,7 @@ class CommentProvider extends ChangeNotifier {
       await _deleteCommentUseCase(postId: postId, commentId: commentId);
       _error = null;
     } catch (e) {
-      debugPrint('❌ Error deleting comment: $e');
-      _error = e.toString();
-      notifyListeners();
+      rethrow;
     }
   }
 
@@ -99,9 +94,7 @@ class CommentProvider extends ChangeNotifier {
       );
       _error = null;
     } catch (e) {
-      debugPrint('❌ Error updating comment: $e');
-      _error = e.toString();
-      notifyListeners();
+      rethrow;
     }
   }
 

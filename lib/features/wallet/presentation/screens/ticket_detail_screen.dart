@@ -59,7 +59,6 @@ Future<Size?> _getImageSize(File file) async {
     final image = await decodeImageFromList(bytes);
     return Size(image.width.toDouble(), image.height.toDouble());
   } catch (e) {
-    debugPrint('Errore decodifica immagine: $e');
     return null;
   }
 }

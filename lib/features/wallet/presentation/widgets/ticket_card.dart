@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tixly/features/auth/data/providers/auth_provider.dart';
 import 'package:tixly/features/wallet/data/models/ticket_model.dart';
+import 'package:tixly/features/wallet/data/providers/wallet_provider.dart';
 import 'package:tixly/features/wallet/presentation/screens/ticket_detail_screen.dart';
 
 class TicketCard extends StatelessWidget {
@@ -36,7 +39,6 @@ class TicketCard extends StatelessWidget {
     } else if ((ticket.type == TicketType.image ||
             ticket.type == TicketType.qr) &&
         ticket.fileUrl != null) {
-      debugPrint('Mostro miniatura: ${ticket.fileUrl}');
       leading = ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: CachedNetworkImage(
@@ -57,7 +59,7 @@ class TicketCard extends StatelessWidget {
       );
     }
 
-    return Card(
+    final card = Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -104,6 +106,53 @@ class TicketCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    return Dismissible(
+      key: Key(ticket.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Conferma eliminazione'),
+              content: const Text('Vuoi davvero eliminare questo biglietto?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('ANNULLA'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('ELIMINA'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      onDismissed: (direction) {
+        final userId = context.read<AuthProvider>().firebaseUser!.uid;
+        context.read<WalletProvider>().deleteTicket(ticket.id, userId);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Biglietto eliminato')),
+        );
+      },
+      background: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+        ),
+      ),
+      child: card,
     );
   }
 }

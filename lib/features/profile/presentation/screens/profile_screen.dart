@@ -10,6 +10,7 @@ import 'package:tixly/core/theme/blur_app_bar.dart';
 import 'package:tixly/core/theme/theme_mode_provider.dart';
 import 'package:tixly/features/auth/data/providers/auth_provider.dart' as app;
 import 'package:tixly/features/profile/data/providers/profile_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -90,18 +91,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         } catch (e) {}
                       }
                     },
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: profile.profileImageUrl != null
-                          ? NetworkImage(profile.profileImageUrl!)
-                          : null,
-                      child: profile.profileImageUrl == null
-                          ? Text(
+                    child: profile.profileImageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: profile.profileImageUrl!,
+                            imageBuilder: (context, imageProvider) => CircleAvatar(
+                              radius: 50,
+                              backgroundImage: imageProvider,
+                            ),
+                            placeholder: (context, url) => const CircleAvatar(
+                              radius: 50,
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => CircleAvatar(
+                              radius: 50,
+                              child: Text(
+                                profile.displayName[0].toUpperCase(),
+                                style: const TextStyle(fontSize: 40),
+                              ),
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            child: Text(
                               profile.displayName[0].toUpperCase(),
                               style: const TextStyle(fontSize: 40),
-                            )
-                          : null,
-                    ),
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -119,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         );
                       } catch (e) {
-                        debugPrint('Errore: $e');
+                        // debugPrint('Errore: $e'); // RIMOSSO
                       }
                     },
                     child: const Text('Aggiorna Profilo!'),

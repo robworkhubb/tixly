@@ -50,12 +50,19 @@ class _PostCardState extends State<PostCard> {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage: authorImage != null
-                      ? NetworkImage(authorImage)
-                      : null,
-                  child: authorImage == null
-                      ? Text(authorName.isNotEmpty ? authorName[0] : '?')
-                      : null,
+                  backgroundColor: Colors.grey[200],
+                  child: authorImage != null
+                      ? ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: authorImage,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2),
+                            errorWidget: (_, __, ___) => Text(authorName.isNotEmpty ? authorName[0] : '?'),
+                          ),
+                        )
+                      : Text(authorName.isNotEmpty ? authorName[0] : '?'),
                 ),
                 const SizedBox(width: 8),
                 Text(
