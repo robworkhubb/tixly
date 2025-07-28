@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="/">
+
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta name="description" content="Reventy - Social memories from events." />
+
+    <!-- iOS meta tags & icons -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Reventy" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <title>Reventy</title>
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <!-- ✅ Firebase Configuration -->
+    <script type="module">
+      // Import Firebase
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+      // Firebase config
+      const firebaseConfig = {
+        apiKey: 'AIzaSyDd8kNx6URUmLTOqyC4ATMGevrGifBRHPY',
+        appId: '1:1048005640444:web:9af73c76d1f4afacf2d779',
+        messagingSenderId: '1048005640444',
+        projectId: 'tixly-bb7f2',
+        authDomain: 'tixly-bb7f2.firebaseapp.com',
+        databaseURL: 'https://tixly-bb7f2-default-rtdb.europe-west1.firebasedatabase.app',
+        storageBucket: 'tixly-bb7f2.firebasestorage.app',
+        measurementId: 'G-XVFJYKZWN9',
+      };
+
+      // Init Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      // Rendi disponibili globalmente
+      window.firebaseApp = app;
+      window.firebaseAuth = auth;
+      window.firebaseDB = db;
+      window.firebaseStorage = storage;
+    </script>
+
+    <!-- ✅ PDF.js UMD build for pdfx -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+    </script>
+
+    <!-- ✅ Flutter bootstrap -->
+    <script src="flutter_bootstrap.js" async></script>
+  </body>
+</html>
